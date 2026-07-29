@@ -35,8 +35,8 @@ canvas { display: block; cursor: crosshair; }
   padding: 20px;
   border-radius: 10px;
   border: 1px solid #334455;
-  max-height: 300px;        /* ← add this */
-  overflow-y: auto;         /* ← add this */
+  max-height: 300px;
+  overflow-y: auto;
 }
 .version-history h3 { color: #ffcc00; margin-bottom: 12px; font-size: 18px; text-align: center; }
 .version-history ul { list-style: none; padding-left: 0; margin: 0; }
@@ -123,6 +123,7 @@ canvas { display: block; cursor: crosshair; }
   transition: transform 0.2s; box-shadow: 0 4px 15px rgba(0,170,68,0.4);
 }
 .report-play-btn:hover { transform: scale(1.05); }
+
 /* Settings Gear + FPS Counter */
 #settingsGear {
   position: fixed;
@@ -149,7 +150,7 @@ canvas { display: block; cursor: crosshair; }
   font-size: 13px;
   font-family: monospace;
   font-weight: bold;
-  display: none; /* hidden by default */
+  display: none;
   background: rgba(0,0,0,0.6);
   padding: 3px 8px;
   border-radius: 4px;
@@ -193,3 +194,117 @@ canvas { display: block; cursor: crosshair; }
   background: #00aa44;
   color: white;
 }
+.settings-dropdown .perf-viewer-btn {
+  border-top: 1px solid rgba(255,255,255,0.1);
+  margin-top: 4px;
+  padding-top: 8px;
+}
+
+/* ─── PERFORMANCE VIEWER ─── */
+#perfViewer {
+  position: fixed;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 360px;
+  height: 280px;
+  z-index: 999;
+  background: rgba(26, 26, 46, 0.5);
+  border: 2px solid rgba(255, 136, 0, 0.7);
+  border-radius: 12px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  display: none;
+  padding: 8px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: #fff;
+  user-select: none;
+}
+.perf-panel {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.perf-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 28px;
+  font-size: 13px;
+  font-weight: bold;
+  color: #ffcc00;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding-bottom: 4px;
+  flex-shrink: 0;
+}
+#perfCloseBtn {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+#perfCloseBtn:hover { color: #ff4444; }
+
+#perfContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-top: 4px;
+  overflow: hidden;
+}
+.perf-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: #ccc;
+  padding: 1px 0;
+  line-height: 1.4;
+  flex-shrink: 0;
+  gap: 4px;
+}
+.perf-row span { white-space: nowrap; }
+.perf-value { font-weight: bold; color: #fff; }
+.perf-good { color: #44ff88; }
+.perf-warn { color: #ffaa00; }
+.perf-bad { color: #ff3333; }
+
+.perf-bar {
+  width: 60px;
+  height: 10px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: middle;
+}
+.perf-bar-fill {
+  height: 100%;
+  background: #44ff88;
+  border-radius: 2px;
+  transition: width 0.1s ease;
+}
+.perf-bar-cpu { background: #ff8800; }
+.perf-bar-gpu { background: #4488ff; }
+
+.perf-graph-container {
+  flex: 1;
+  min-height: 60px;
+  margin-top: 2px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 4px;
+  padding: 2px;
+  overflow: hidden;
+}
+#perfGraph {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+/* ─── END PERFORMANCE VIEWER ─── */

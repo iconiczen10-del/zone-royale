@@ -5,7 +5,7 @@ import { InputHandler } from './InputHandler.js';
 import { MapGenerator } from './MapGenerator.js';
 import { ZoneManager } from './ZoneManager.js';
 import { Renderer } from './Renderer.js';
-import { UIManager } from './UIManager.js';
+import { UIManager } from '../ui/UIManager.js';
 import { SoundManager } from './SoundManager.js';
 import { CollisionSystem } from './CollisionSystem.js';
 import { WeaponActions } from './WeaponActions.js';
@@ -14,6 +14,7 @@ import { BotAI } from './BotAI.js';
 import { SpawnManager } from './SpawnManager.js';
 import { LootSystem } from './LootSystem.js';
 import { ChatManager } from './chat/ChatManager.js';
+import { PerformanceViewer } from '../ui/PerformanceViewer.js';
 
 export class Game {
   constructor(canvas, botCount, gameMode = 'standard') {
@@ -64,6 +65,7 @@ export class Game {
     this.renderer = new Renderer(canvas, this.ctx);
     this.ui = new UIManager();
     this.chatManager = new ChatManager();
+    this.perfViewer = new PerformanceViewer(this);
   }
 
   init() {
@@ -81,6 +83,7 @@ export class Game {
     if (this.player) {
       this.player.lastPosition = { x: this.player.x, y: this.player.y };
     }
+    this.perfViewer.metrics.gameMode = this.gameMode;
   }
 
   bindEvents() {
@@ -143,6 +146,8 @@ export class Game {
       botsAlive: this.aliveCount - 1,
     };
     this.ui.showMatchReport(matchStats);
+    this.perfViewer.visible = false;
+    this.ui.hidePerfViewer();
   }
 
   getFavouriteWeapon(player) {
@@ -170,6 +175,9 @@ export class Game {
       if (this.fpsHistory.length > 10) this.fpsHistory.shift();
       this.currentFPS = Math.round(this.fpsHistory.reduce((a, b) => a + b, 0) / this.fpsHistory.length);
     }
+
+    // Update Performance Viewer metrics (every frame)
+    this.perfViewer.updateMetrics();
 
     // Ping system
     if (this.gameMode === 'target' && this.player.alive) {

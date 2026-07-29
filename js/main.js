@@ -10,10 +10,11 @@ function startGame() {
   const gameMode = document.getElementById('gameModeSelect').value;
   game = new Game(canvas, botCount, gameMode);
   game.init();
+  window.game = game; // Expose to UIManager
 }
 
 document.getElementById('startBtn').addEventListener('click', startGame);
-document.getElementById('playAgainBtn2').addEventListener('click', startGame); // match report replay
+document.getElementById('playAgainBtn2').addEventListener('click', startGame);
 
 window.addEventListener('resize', () => {
   if (game) {

@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Zone Royale v1.9.1</title>
+  <title>Zone Royale v1.9.1.1</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div id="startScreen">
-  <h1>⚔️ Zone Royale v1.9.1</h1>
+  <h1>⚔️ Zone Royale v1.9.1.1</h1>
   <p>Drop into a 2D battlefield. Loot, survive the shrinking zone, and be the last one standing!</p>
   <div class="bot-select">
     <label for="botCountSelect">AI Bots:</label>
@@ -36,6 +36,7 @@
   <div class="version-history">
     <h3>📜 Version History</h3>
     <ul>
+      <li><strong>v1.9.1.1</strong> – Full Performance Viewer: real-time FPS, CPU/GPU, entities, graph, and more. 360×280 with 50% transparency. Fixed PV not showing data.</li>
       <li><strong>v1.9.1</strong> – FPS counter + settings gear in top‑left corner. Toggle FPS display on/off.</li>
       <li><strong>v1.9.0C</strong> – Bot chat system: bots now speak with speech bubbles based on their state (wander, chase, engage, hurt, kill, and more). 4 dedicated chat modules.</li>
       <li><strong>v1.8.7A</strong> – Full post‑match stats screen: kills, damage, accuracy, distance, favourite weapon, top killer bot, and more.</li>
@@ -84,6 +85,51 @@
   <div class="setting-row">
     <span>FPS Counter</span>
     <button class="toggle-btn" id="fpsToggleBtn">OFF</button>
+  </div>
+  <div class="setting-row perf-viewer-btn">
+    <span>📊 Performance Viewer</span>
+    <button class="toggle-btn" id="perfToggleBtn">OPEN</button>
+  </div>
+</div>
+
+<!-- Performance Viewer -->
+<div id="perfViewer">
+  <div class="perf-panel">
+    <div class="perf-header">
+      <span>⚡ PERFORMANCE VIEWER</span>
+      <button id="perfCloseBtn">✕</button>
+    </div>
+    <div id="perfContent">
+      <div class="perf-row">
+        <span>FPS: <span class="perf-value" id="perfFps">--</span></span>
+        <span>Avg: <span class="perf-value" id="perfAvg">--</span></span>
+        <span>Min: <span class="perf-value" id="perfMin">--</span></span>
+        <span>Max: <span class="perf-value" id="perfMax">--</span></span>
+      </div>
+      <div class="perf-row">
+        <span>Frame Time: <span id="perfFrameTime">--</span>ms</span>
+        <span><div class="perf-bar"><div class="perf-bar-fill" id="perfFrameBar" style="width:0%"></div></div></span>
+      </div>
+      <div class="perf-row">
+        <span>Bots: <span id="perfBots">--</span></span>
+        <span>Bullets: <span id="perfBullets">--</span></span>
+        <span>Particles: <span id="perfParticles">--</span></span>
+      </div>
+      <div class="perf-row">
+        <span>CPU: <span id="perfCpu">--</span>ms</span>
+        <span><div class="perf-bar"><div class="perf-bar-fill perf-bar-cpu" id="perfCpuBar" style="width:0%"></div></div></span>
+        <span>GPU: <span id="perfGpu">--</span>ms</span>
+        <span><div class="perf-bar"><div class="perf-bar-fill perf-bar-gpu" id="perfGpuBar" style="width:0%"></div></div></span>
+      </div>
+      <div class="perf-row">
+        <span>Zone: <span id="perfZone">--</span>/5</span>
+        <span>Alive: <span id="perfAlive">--</span></span>
+        <span>Mode: <span id="perfMode">--</span></span>
+      </div>
+      <div class="perf-graph-container">
+        <canvas id="perfGraph" width="344" height="80"></canvas>
+      </div>
+    </div>
   </div>
 </div>
 
