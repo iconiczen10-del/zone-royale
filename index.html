@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zone Royale v1.9.1</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="startScreen">
+  <h1>⚔️ Zone Royale v1.9.1</h1>
+  <p>Drop into a 2D battlefield. Loot, survive the shrinking zone, and be the last one standing!</p>
+  <div class="bot-select">
+    <label for="botCountSelect">AI Bots:</label>
+    <select id="botCountSelect">
+      <option value="15" selected>15</option>
+      <option value="25">25</option>
+      <option value="40">40</option>
+      <option value="50">50</option>
+    </select>
+
+    <label for="gameModeSelect" style="margin-left: 25px;">Game Mode:</label>
+    <select id="gameModeSelect">
+      <option value="standard" selected>Standard</option>
+      <option value="target">THE Target</option>
+    </select>
+  </div>
+  <button id="startBtn">DROP IN</button>
+  <div id="controls">
+    WASD / Arrow Keys: Move &nbsp;|&nbsp; Mouse: Aim &nbsp;|&nbsp; Click: Shoot<br>
+    R: Reload &nbsp;|&nbsp; F: Use Heal &nbsp;|&nbsp; E: Pick up loot &nbsp;|&nbsp; 1-4: Switch weapons<br>
+    Tab: Inventory & Stats
+  </div>
+
+  <div class="version-history">
+    <h3>📜 Version History</h3>
+    <ul>
+      <li><strong>v1.9.1</strong> – FPS counter + settings gear in top‑left corner. Toggle FPS display on/off.</li>
+      <li><strong>v1.9.0C</strong> – Bot chat system: bots now speak with speech bubbles based on their state (wander, chase, engage, hurt, kill, and more). 4 dedicated chat modules.</li>
+      <li><strong>v1.8.7A</strong> – Full post‑match stats screen: kills, damage, accuracy, distance, favourite weapon, top killer bot, and more.</li>
+      <li><strong>v1.8.6A</strong> – "THE Target" ping mechanic: bots know your location every 10s for 5s, ignore loot while hunting, 80% player focus. Minimap pulse alert.</li>
+      <li><strong>v1.8.5A</strong> – New game mode: "THE Target". Bots prioritise hunting you (80% chance). Player‑focused swarm mode.</li>
+      <li><strong>v1.8.0MPC</strong> – Massive code structure overhaul: split Game.js into five focused modules. One file, one job.</li>
+      <li><strong>v1.7.1.3U</strong> – Fixed crash when bot touches zone (missing variable).</li>
+      <li><strong>v1.7.1.2U</strong> – Fixed game freeze when zone starts shrinking + zone damage sound.</li>
+      <li><strong>v1.7.1.1U</strong> – Fixed bots getting stuck on zone edge (20px safe‑inside buffer).</li>
+      <li><strong>v1.7.1U</strong> – Ultra sound overhaul: unique weapon sounds, hit/kill feedback, environmental alerts, stereo panning & spatial reverb.</li>
+      <li><strong>v1.7.0MPC</strong> – Enlarged map to 4800×4800; bot vision range 320‑440px for calmer early game.</li>
+      <li><strong>v1.6.0MPC</strong> – Leader glow (most kills entity shines) & spawn separation (min. 500px).</li>
+      <li><strong>v1.5.6MPC</strong> – Added changelog to start screen.</li>
+      <li><strong>v1.5.5MPC</strong> – Fully modular codebase (16 files), ready for easy updates.</li>
+      <li><strong>v1.5.1</strong> – Fixed inventory blocking game‑over screen; correct placement for all bot counts.</li>
+      <li><strong>v1.5</strong> – Bot count selector (15‑50), player stats, inventory management, new Shotgun Pro, richer sounds.</li>
+      <li><strong>v1.0</strong> – First release: 15 bots, 5 weapons, shrinking zone, kill feed, minimap, sound effects.</li>
+    </ul>
+  </div>
+</div>
+
+<div id="gameOver"></div>
+
+<div id="matchReport">
+  <div class="report-panel">
+    <h1 id="reportTitle"></h1>
+    <div id="reportContent"></div>
+    <button id="playAgainBtn2" class="report-play-btn">PLAY AGAIN</button>
+  </div>
+</div>
+
+<div id="inventoryScreen">
+  <div class="panel">
+    <div class="inv-title">🎒 INVENTORY & STATS</div>
+    <div id="invContainer"></div>
+    <button class="close-inv" id="closeInvBtn">CLOSE</button>
+  </div>
+</div>
+
+<canvas id="gameCanvas"></canvas>
+
+<!-- Settings Gear + FPS -->
+<div id="settingsGear" title="Settings">⚙️</div>
+<div id="fpsDisplay">FPS: 60</div>
+<div class="settings-dropdown" id="settingsDropdown">
+  <div class="setting-row">
+    <span>FPS Counter</span>
+    <button class="toggle-btn" id="fpsToggleBtn">OFF</button>
+  </div>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

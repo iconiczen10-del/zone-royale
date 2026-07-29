@@ -1,0 +1,195 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0a0a0a; overflow: hidden; font-family: 'Segoe UI', Arial, sans-serif; }
+canvas { display: block; cursor: crosshair; }
+
+/* Start Screen */
+#startScreen {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 100%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 100; color: white;
+}
+#startScreen h1 { color: #ff8800; font-size: 48px; margin-bottom: 10px; text-shadow: 0 0 20px rgba(255,136,0,0.5); }
+#startScreen p { color: #88aacc; font-size: 16px; margin-bottom: 20px; max-width: 500px; text-align: center; line-height: 1.6; }
+.bot-select { margin-bottom: 25px; display: flex; align-items: center; gap: 15px; flex-wrap: wrap; justify-content: center; }
+.bot-select label { color: #ffcc00; font-size: 18px; }
+.bot-select select { padding: 8px 15px; font-size: 18px; background: #1a1a3a; color: #fff; border: 2px solid #ff8800; border-radius: 5px; cursor: pointer; }
+#startBtn {
+  padding: 15px 50px; font-size: 22px; font-weight: bold;
+  background: linear-gradient(135deg, #ff6600, #ff8800);
+  border: none; border-radius: 8px; color: white; cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 15px rgba(255,102,0,0.4);
+}
+#startBtn:hover { transform: scale(1.05); box-shadow: 0 6px 25px rgba(255,102,0,0.6); }
+#controls { color: #6688aa; font-size: 13px; margin-top: 20px; text-align: center; line-height: 1.8; }
+
+/* Version History on Start Screen */
+.version-history {
+  margin-top: 25px;
+  max-width: 550px;
+  width: 90%;
+  text-align: left;
+  color: #88aacc;
+  background: rgba(255,255,255,0.05);
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #334455;
+  max-height: 300px;        /* ← add this */
+  overflow-y: auto;         /* ← add this */
+}
+.version-history h3 { color: #ffcc00; margin-bottom: 12px; font-size: 18px; text-align: center; }
+.version-history ul { list-style: none; padding-left: 0; margin: 0; }
+.version-history li { margin-bottom: 8px; font-size: 14px; line-height: 1.5; padding-left: 10px; border-left: 2px solid #ff8800; }
+.version-history li strong { color: #ffaa44; }
+
+/* Game Over (kept for legacy, but now we use match report) */
+#gameOver {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.85); display: none; flex-direction: column;
+  align-items: center; justify-content: center; z-index: 100;
+}
+#gameOver h1 { font-size: 56px; margin-bottom: 10px; text-shadow: 0 0 30px currentColor; }
+#gameOver .placement { color: #cccccc; font-size: 24px; margin-bottom: 30px; }
+
+/* Inventory Screen */
+#inventoryScreen {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.8); display: none; z-index: 200;
+  justify-content: center; align-items: center;
+}
+#inventoryScreen .panel {
+  background: #1a1a2e; border: 2px solid #ff8800; border-radius: 12px;
+  padding: 30px; max-width: 600px; width: 90%; color: #ccc;
+  display: flex; flex-direction: column; gap: 20px;
+  max-height: 80vh; overflow-y: auto;
+}
+.inv-title { text-align: center; font-size: 24px; color: #ffcc00; font-weight: bold; }
+.inv-slot { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 8px; }
+.inv-weapon-name { flex: 2; font-weight: bold; }
+.inv-ammo { flex: 1; font-size: 14px; color: #aaa; }
+.inv-btn { background: #cc3333; color: white; border: none; padding: 5px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+.inv-btn:hover { background: #ff4444; }
+.inv-btn:disabled { background: #555; cursor: not-allowed; }
+.stats-row { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.stat { background: rgba(255,255,255,0.08); padding: 8px 12px; border-radius: 6px; text-align: center; min-width: 70px; }
+.stat-value { font-size: 20px; font-weight: bold; color: #ffcc00; }
+.stat-label { font-size: 12px; color: #888; }
+.close-inv { margin-top: 15px; background: #ff8800; color: white; border: none; padding: 10px; border-radius: 8px; font-size: 16px; cursor: pointer; width: 100%; }
+
+/* Match Report Overlay */
+#matchReport {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.85); display: none; z-index: 300;
+  justify-content: center; align-items: center; overflow-y: auto;
+}
+#matchReport .report-panel {
+  background: linear-gradient(135deg, #0a0a1a, #1a1a3a);
+  border: 2px solid #ff8800; border-radius: 12px;
+  padding: 30px; max-width: 700px; width: 90%;
+  color: #ccc; max-height: 90vh; overflow-y: auto;
+}
+#reportTitle {
+  text-align: center; font-size: 40px; margin-bottom: 20px;
+  text-shadow: 0 0 20px currentColor;
+}
+.report-section {
+  margin-bottom: 25px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 8px; padding: 15px;
+}
+.report-section h2 {
+  color: #ffcc00; font-size: 20px; margin-bottom: 10px;
+  border-bottom: 1px solid #334455; padding-bottom: 5px;
+}
+.report-row {
+  display: flex; justify-content: space-between; padding: 5px 0;
+  font-size: 16px;
+}
+.report-row span:last-child { color: #fff; font-weight: bold; }
+.report-weapon-list {
+  display: flex; flex-wrap: wrap; gap: 15px; margin-top: 8px;
+}
+.report-weapon-entry {
+  background: rgba(255,255,255,0.08); padding: 8px 12px; border-radius: 6px;
+  font-size: 14px;
+}
+.report-weapon-entry strong { color: #ffaa44; }
+.report-play-btn {
+  display: block; margin: 20px auto 0;
+  padding: 12px 40px; font-size: 20px; font-weight: bold;
+  background: linear-gradient(135deg, #00aa44, #00cc66);
+  border: none; border-radius: 8px; color: white; cursor: pointer;
+  transition: transform 0.2s; box-shadow: 0 4px 15px rgba(0,170,68,0.4);
+}
+.report-play-btn:hover { transform: scale(1.05); }
+/* Settings Gear + FPS Counter */
+#settingsGear {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 50;
+  font-size: 22px;
+  cursor: pointer;
+  color: #cccccc;
+  user-select: none;
+  transition: transform 0.2s;
+}
+#settingsGear:hover {
+  color: #ffffff;
+  transform: rotate(30deg);
+}
+
+#fpsDisplay {
+  position: fixed;
+  top: 40px;
+  left: 12px;
+  z-index: 50;
+  color: #00ff88;
+  font-size: 13px;
+  font-family: monospace;
+  font-weight: bold;
+  display: none; /* hidden by default */
+  background: rgba(0,0,0,0.6);
+  padding: 3px 8px;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.settings-dropdown {
+  position: fixed;
+  top: 40px;
+  left: 10px;
+  z-index: 55;
+  background: rgba(10,10,20,0.92);
+  border: 1px solid #555;
+  border-radius: 6px;
+  padding: 8px 0;
+  display: none;
+  min-width: 160px;
+}
+.settings-dropdown .setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 14px;
+  color: #ccc;
+  font-size: 13px;
+}
+.settings-dropdown .setting-row:hover {
+  background: rgba(255,255,255,0.08);
+}
+.settings-dropdown .toggle-btn {
+  background: #333;
+  color: #aaa;
+  border: none;
+  padding: 4px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+}
+.settings-dropdown .toggle-btn.on {
+  background: #00aa44;
+  color: white;
+}
