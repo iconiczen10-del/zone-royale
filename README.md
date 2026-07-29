@@ -1,4 +1,4 @@
-# ⚔️ Zone Royale (v1.9.1)
+# ⚔️ Zone Royale (v1.9.1.1)
 
 [![Version](https://img.shields.io/badge/version-1.9.1-brightgreen.svg)](https://github.com/iconiczen10-del/zone-royale)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
