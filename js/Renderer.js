@@ -1,7 +1,7 @@
 import { CONFIG, ZONE_PHASES } from './config.js';
 import { WeaponDefs } from './WeaponDefs.js';
 import { RenderChat } from './chat/RenderChat.js';
-import { drawHUD } from '../ui/HUDRenderer.js';
+import { drawHUD } from './HUDRenderer.js';
 
 export class Renderer {
   constructor(canvas, ctx) {
@@ -27,6 +27,7 @@ export class Renderer {
     this.drawBullets(game);
     this.drawParticles(game);
     this.drawZone(game);
+    this.drawTownBorder(game, cam); // NEW: Town border
     RenderChat.render(game);
     ctx.restore();
 
@@ -59,18 +60,88 @@ export class Renderer {
     ctx.strokeRect(0, 0, CONFIG.MAP_SIZE, CONFIG.MAP_SIZE);
   }
 
+  drawTownBorder(game, cam) {
+    const ctx = this.ctx;
+    if (!game.towns || game.towns.length === 0) return;
+
+    for (const town of game.towns) {
+      const x = town.x - town.size / 2;
+      const y = town.y - town.size / 2;
+      const size = town.size;
+
+      // Only draw if on screen
+      if (x + size < cam.x - 50 || x > cam.x + this.canvas.width + 50) continue;
+      if (y + size < cam.y - 50 || y > cam.y + this.canvas.height + 50) continue;
+
+      // ─── TOWN BORDER ──────────────────────────────
+      ctx.strokeStyle = 'rgba(255, 215, 0, 0.6)';
+      ctx.lineWidth = 3;
+      ctx.setLineDash([8, 8]);
+      ctx.strokeRect(x, y, size, size);
+      ctx.setLineDash([]);
+
+      // ─── TOWN NAME LABEL ──────────────────────────
+      ctx.fillStyle = 'rgba(255, 215, 0, 0.5)';
+      ctx.font = 'bold 16px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillText(`🏘️ ${town.name}`, town.x, y - 22);
+    }
+  }
+
   drawBuildings(game, cam) {
     const ctx = this.ctx;
     for (const b of game.buildings) {
       if (b.x + b.w < cam.x - 50 || b.x > cam.x + this.canvas.width + 50) continue;
       if (b.y + b.h < cam.y - 50 || b.y > cam.y + this.canvas.height + 50) continue;
+
       ctx.fillStyle = b.color;
       ctx.fillRect(b.x, b.y, b.w, b.h);
       ctx.strokeStyle = '#1a1a1a';
       ctx.lineWidth = 2;
       ctx.strokeRect(b.x, b.y, b.w, b.h);
-      ctx.fillStyle = '#4a3a2a';
-      ctx.fillRect(b.x + b.w / 2 - 8, b.y + b.h - 4, 16, 4);
+
+      ctx.fillStyle = '#3a2a1a';
+      ctx.fillRect(b.x + 4, b.y + 2, b.w - 8, 6);
+
+      if (b.w > 50 && b.h > 50) {
+        ctx.fillStyle = 'rgba(200, 200, 150, 0.3)';
+        const cols = Math.floor(b.w / 25);
+        const rows = Math.floor(b.h / 25);
+        for (let r = 0; r < rows && r < 3; r++) {
+          for (let c = 0; c < cols && c < 3; c++) {
+            const wx = b.x + 8 + c * (b.w - 16) / (cols);
+            const wy = b.y + 12 + r * (b.h - 20) / (rows);
+            ctx.fillRect(wx, wy, 10, 12);
+          }
+        }
+      }
+
+      if (b.isLandmark) {
+        ctx.strokeStyle = '#FFD700';
+        ctx.lineWidth = 3;
+        ctx.setLineDash([4, 6]);
+        ctx.strokeRect(b.x - 4, b.y - 4, b.w + 8, b.h + 8);
+        ctx.setLineDash([]);
+      }
+
+      if (b.isSign) {
+        ctx.fillStyle = '#2F4F4F';
+        ctx.fillRect(b.x, b.y, b.w, b.h);
+        ctx.fillStyle = '#FFD700';
+        ctx.font = 'bold 14px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🏘️ DOZX', b.x + b.w / 2, b.y + b.h / 2);
+      }
+
+      if (b.name && b.isTown) {
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.font = '9px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(b.name, b.x + b.w / 2, b.y - 2);
+      }
     }
   }
 
@@ -132,11 +203,22 @@ export class Renderer {
     const ctx = this.ctx;
     for (const item of game.lootItems) {
       if (Math.abs(item.x - cam.x - this.canvas.width / 2) > this.canvas.width) continue;
-      let color, label;
+
+      let color, label, tierColor;
+      const tier = item.tier || 3;
+
+      const tierColors = {
+        1: '#b44dff',
+        2: '#4488ff',
+        3: '#44cc44',
+        4: '#aaaaaa',
+      };
+      tierColor = tierColors[tier] || '#aaaaaa';
+
       switch (item.type) {
         case 'weapon':
-          color = WeaponDefs[item.subtype].color;
-          label = item.subtype[0].toUpperCase();
+          color = WeaponDefs[item.subtype]?.color || '#ffaa00';
+          label = item.subtype?.[0]?.toUpperCase() || 'W';
           break;
         case 'heal':
           color = item.subtype === 'medkit' ? '#ff4488' : '#44ff88';
@@ -150,20 +232,38 @@ export class Renderer {
           color = '#ffaa00';
           label = '•';
           break;
+        default:
+          color = '#888';
+          label = '?';
       }
-      ctx.fillStyle = color + '44';
+
+      ctx.shadowColor = tierColor;
+      ctx.shadowBlur = 12;
+
+      ctx.fillStyle = tierColor + '44';
       ctx.beginPath();
-      ctx.arc(item.x, item.y, 14, 0, Math.PI * 2);
+      ctx.arc(item.x, item.y, 16, 0, Math.PI * 2);
       ctx.fill();
+
+      ctx.shadowBlur = 8;
       ctx.fillStyle = color;
       ctx.beginPath();
       ctx.arc(item.x, item.y, 8, 0, Math.PI * 2);
       ctx.fill();
+
+      ctx.shadowBlur = 0;
       ctx.fillStyle = '#fff';
       ctx.font = 'bold 9px Arial';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(label, item.x, item.y);
+
+      ctx.fillStyle = tierColor;
+      ctx.beginPath();
+      ctx.arc(item.x + 12, item.y - 12, 3, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.shadowBlur = 0;
     }
   }
 

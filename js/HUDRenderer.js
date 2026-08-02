@@ -1,11 +1,9 @@
-import { CONFIG, ZONE_PHASES } from '../js/config.js';
-import { WeaponDefs } from '../js/WeaponDefs.js';
+import { CONFIG, ZONE_PHASES } from './config.js';
+import { WeaponDefs } from './WeaponDefs.js';
 
 export function drawHUD(game, ctx) {
   const p = game.player;
   const canvas = game.canvas;
-
-  // FPS is handled by UIManager.updateFPSDisplay()
 
   const hudX = 20, hudY = canvas.height - 130;
   ctx.fillStyle = 'rgba(0,0,0,0.7)';

@@ -6,20 +6,33 @@ export class LootSystem {
     const count = 1 + Math.floor(Math.random() * 3);
     for (let i = 0; i < count; i++) {
       const roll = Math.random();
-      let type, subtype;
-      if (roll < 0.10) { type = 'weapon'; subtype = 'shotgunPro'; }
-      else if (roll < 0.18) { type = 'weapon'; subtype = 'shotgun'; }
-      else if (roll < 0.30) { type = 'weapon'; subtype = 'rifle'; }
-      else if (roll < 0.40) { type = 'weapon'; subtype = 'sniper'; }
-      else if (roll < 0.52) { type = 'weapon'; subtype = 'pistol'; }
-      else if (roll < 0.64) { type = 'heal'; subtype = 'bandage'; }
-      else if (roll < 0.74) { type = 'heal'; subtype = 'medkit'; }
-      else if (roll < 0.84) { type = 'armor'; subtype = 'vest'; }
-      else { type = 'ammo'; subtype = 'ammo'; }
+      let type, subtype, tier = 3;
+
+      if (roll < 0.10) { type = 'weapon';
+        subtype = 'shotgunPro';
+        tier = 1; } else if (roll < 0.18) { type = 'weapon';
+        subtype = 'shotgun';
+        tier = 2; } else if (roll < 0.30) { type = 'weapon';
+        subtype = 'rifle';
+        tier = 2; } else if (roll < 0.40) { type = 'weapon';
+        subtype = 'sniper';
+        tier = 1; } else if (roll < 0.52) { type = 'weapon';
+        subtype = 'pistol';
+        tier = 3; } else if (roll < 0.64) { type = 'heal';
+        subtype = 'bandage';
+        tier = 3; } else if (roll < 0.74) { type = 'heal';
+        subtype = 'medkit';
+        tier = 1; } else if (roll < 0.84) { type = 'armor';
+        subtype = 'vest';
+        tier = 2; } else { type = 'ammo';
+        subtype = 'ammo';
+        tier = 3; }
+
       items.push({
         x: crate.x + (Math.random() - 0.5) * 40,
         y: crate.y + (Math.random() - 0.5) * 40,
-        type, subtype, id: Math.random()
+        type, subtype, id: Math.random(),
+        tier: tier
       });
     }
     return items;
@@ -28,10 +41,12 @@ export class LootSystem {
   static pickupLoot(entity, game) {
     const pickupRange = 45;
     let picked = false;
+
     for (let i = game.lootItems.length - 1; i >= 0; i--) {
       const item = game.lootItems[i];
-      const dx = entity.x - item.x, dy = entity.y - item.y;
-      if (dx*dx + dy*dy < pickupRange * pickupRange) {
+      const dx = entity.x - item.x,
+        dy = entity.y - item.y;
+      if (dx * dx + dy * dy < pickupRange * pickupRange) {
         if (item.type === 'weapon') {
           const existing = entity.weapons.find(w => w.type === item.subtype);
           if (existing) {
@@ -60,15 +75,17 @@ export class LootSystem {
         }
       }
     }
+
     for (const crate of game.crates) {
       if (crate.opened) continue;
-      const dx = entity.x - crate.x, dy = entity.y - crate.y;
-      if (dx*dx + dy*dy < 50 * 50) {
+      const dx = entity.x - crate.x,
+        dy = entity.y - crate.y;
+      if (dx * dx + dy * dy < 50 * 50) {
         crate.opened = true;
-const items = LootSystem.generateCrateLoot(crate);
-game.lootItems.push(...items);
-game.sound.play('crate_open', crate.x, crate.y, game.camera.x, game.camera.y);
-if (entity.isPlayer) game.sound.play('pickup');
+        const items = LootSystem.generateCrateLoot(crate);
+        game.lootItems.push(...items);
+        game.sound.play('crate_open', crate.x, crate.y, game.camera.x, game.camera.y);
+        if (entity.isPlayer) game.sound.play('pickup');
       }
     }
   }
@@ -76,12 +93,14 @@ if (entity.isPlayer) game.sound.play('pickup');
   static dropWeapon(player, idx, game) {
     if (player.weapons[idx].type === 'fists') return;
     const w = player.weapons[idx];
+    const tier = LootSystem.getWeaponTier(w.type);
     game.lootItems.push({
-      x: player.x + (Math.random()-0.5)*20,
-      y: player.y + (Math.random()-0.5)*20,
+      x: player.x + (Math.random() - 0.5) * 20,
+      y: player.y + (Math.random() - 0.5) * 20,
       type: 'weapon',
       subtype: w.type,
-      id: Math.random()
+      id: Math.random(),
+      tier: tier
     });
     player.weapons.splice(idx, 1);
     if (player.currentWeapon >= player.weapons.length) player.currentWeapon = player.weapons.length - 1;
@@ -92,20 +111,53 @@ if (entity.isPlayer) game.sound.play('pickup');
   static dropHeal(player, type, game) {
     if (type === 'bandages' && player.bandages > 0) {
       player.bandages--;
-      game.lootItems.push({ x: player.x + (Math.random()-0.5)*20, y: player.y + (Math.random()-0.5)*20, type: 'heal', subtype: 'bandage', id: Math.random() });
+      game.lootItems.push({
+        x: player.x + (Math.random() - 0.5) * 20,
+        y: player.y + (Math.random() - 0.5) * 20,
+        type: 'heal',
+        subtype: 'bandage',
+        id: Math.random(),
+        tier: 3
+      });
       game.sound.play('drop');
     } else if (type === 'medkits' && player.medkits > 0) {
       player.medkits--;
-      game.lootItems.push({ x: player.x + (Math.random()-0.5)*20, y: player.y + (Math.random()-0.5)*20, type: 'heal', subtype: 'medkit', id: Math.random() });
+      game.lootItems.push({
+        x: player.x + (Math.random() - 0.5) * 20,
+        y: player.y + (Math.random() - 0.5) * 20,
+        type: 'heal',
+        subtype: 'medkit',
+        id: Math.random(),
+        tier: 1
+      });
       game.sound.play('drop');
     }
   }
 
   static dropArmor(player, game) {
     if (player.armor > 0) {
-      game.lootItems.push({ x: player.x + (Math.random()-0.5)*20, y: player.y + (Math.random()-0.5)*20, type: 'armor', subtype: 'vest', id: Math.random() });
+      game.lootItems.push({
+        x: player.x + (Math.random() - 0.5) * 20,
+        y: player.y + (Math.random() - 0.5) * 20,
+        type: 'armor',
+        subtype: 'vest',
+        id: Math.random(),
+        tier: 2
+      });
       player.armor = 0;
       game.sound.play('drop');
     }
+  }
+
+  static getWeaponTier(weaponType) {
+    const tiers = {
+      'sniper': 1,
+      'shotgunPro': 1,
+      'rifle': 2,
+      'shotgun': 2,
+      'pistol': 3,
+      'fists': 4,
+    };
+    return tiers[weaponType] || 3;
   }
 }

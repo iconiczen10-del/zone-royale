@@ -4,7 +4,7 @@ import { Player } from './Player.js';
 import { Bot } from './Bot.js';
 import { CollisionSystem } from './CollisionSystem.js';
 
-const MIN_SPAWN_DIST = 500;   // move this from Game.js to here, but keep in Game.js? We'll remove from Game.js and use this one.
+const MIN_SPAWN_DIST = 500;
 
 export class SpawnManager {
   static spawnEntities(game) {
@@ -17,7 +17,7 @@ export class SpawnManager {
       return false;
     };
 
-    // Player
+    // ─── PLAYER ─────────────────────────────────────
     let px, py;
     let attempts = 0;
     do {
@@ -31,7 +31,7 @@ export class SpawnManager {
     game.player.weapons.push({ type: 'pistol', ammo: 15, reserveAmmo: 30 });
     game.player.currentWeapon = 1;
 
-    // Bots
+    // ─── BOTS ──────────────────────────────────────
     game.bots = [];
     for (let i = 0; i < game.botCount; i++) {
       let bx, by;
@@ -51,5 +51,8 @@ export class SpawnManager {
       if (Math.random() < 0.3) bot.armor = 50;
       game.bots.push(bot);
     }
+
+    // ─── DOZX TOWN LOOT (already spawned in MapGenerator) ───
+    // No additional spawn needed – loot is placed in MapGenerator.generateDOZXTown()
   }
 }

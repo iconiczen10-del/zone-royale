@@ -10,7 +10,7 @@ export class CombatSystem {
     const def = entity.currentWeaponDef;
     if (now - entity.lastFireTime < def.fireRate) return;
     if (w.ammo <= 0 && w.type !== 'fists') {
-      WeaponActions.startReload(game, entity);   // cyclic? we'll import inside or move to Game
+      WeaponActions.startReload(game, entity);
       return;
     }
     if (entity.isPlayer) entity.stats.shotsFired++;
@@ -89,6 +89,10 @@ export class CombatSystem {
       target.alive = false;
       game.aliveCount--;
       game.deathOrder.push(target.name);
+
+      // ─── LOOT EXPLOSION ──────────────────────────
+      CombatSystem.explodeLoot(game, target);
+
       if (attacker) {
         attacker.kills++;
         if (attacker.isPlayer) attacker.stats.kills = attacker.kills;
@@ -96,24 +100,106 @@ export class CombatSystem {
       } else {
         game.addKillFeed('Zone', target.name);
       }
+
       if (target.isPlayer) {
         game.sound.play('death');
         game.endGame(false);
       } else {
-        game.sound.play('kill');
+        // ─── KILL SOUND REMOVED ─────────────────────
+        // game.sound.play('kill'); // <-- REMOVED
+
+        // Drop weapons
         for (const w of target.weapons) {
           if (w.type !== 'fists') {
             game.lootItems.push({
               x: target.x + (Math.random() - 0.5) * 20,
               y: target.y + (Math.random() - 0.5) * 20,
-              type: 'weapon', subtype: w.type, id: Math.random()
+              type: 'weapon', subtype: w.type, id: Math.random(),
+              tier: CombatSystem.getWeaponTier(w.type)
             });
           }
         }
-        if (target.bandages > 0) game.lootItems.push({ x: target.x, y: target.y + 15, type: 'heal', subtype: 'bandage', id: Math.random() });
-        if (target.medkits > 0) game.lootItems.push({ x: target.x + 10, y: target.y + 15, type: 'heal', subtype: 'medkit', id: Math.random() });
+        if (target.bandages > 0) {
+          game.lootItems.push({
+            x: target.x, y: target.y + 15,
+            type: 'heal', subtype: 'bandage', id: Math.random(),
+            tier: 3
+          });
+        }
+        if (target.medkits > 0) {
+          game.lootItems.push({
+            x: target.x + 10, y: target.y + 15,
+            type: 'heal', subtype: 'medkit', id: Math.random(),
+            tier: 1
+          });
+        }
       }
       if (game.aliveCount <= 1 && game.player.alive) game.endGame(true);
     }
+  }
+
+  static explodeLoot(game, entity) {
+    const botColor = entity.bodyColor || '#ff4444';
+    const numParticles = 25 + Math.floor(Math.random() * 15);
+
+    for (let i = 0; i < numParticles; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 80 + Math.random() * 200;
+      game.particles.push({
+        x: entity.x,
+        y: entity.y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 30,
+        life: 25 + Math.random() * 15,
+        maxLife: 40,
+        color: botColor,
+        size: 2 + Math.random() * 5,
+        type: 'explosion'
+      });
+    }
+
+    for (let i = 0; i < 20; i++) {
+      const angle = (i / 20) * Math.PI * 2;
+      const dist = 10 + Math.random() * 30;
+      game.particles.push({
+        x: entity.x + Math.cos(angle) * dist,
+        y: entity.y + Math.sin(angle) * dist,
+        vx: Math.cos(angle) * 60,
+        vy: Math.sin(angle) * 60,
+        life: 10,
+        maxLife: 10,
+        color: '#ffffff',
+        size: 3 + Math.random() * 4,
+        type: 'shockwave'
+      });
+    }
+
+    for (let i = 0; i < 10; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 5 + Math.random() * 20;
+      game.particles.push({
+        x: entity.x + Math.cos(angle) * dist,
+        y: entity.y + Math.sin(angle) * dist,
+        vx: Math.cos(angle) * 20,
+        vy: Math.sin(angle) * 20 - 10,
+        life: 15,
+        maxLife: 15,
+        color: botColor,
+        size: 8 + Math.random() * 8,
+        type: 'glow'
+      });
+    }
+  }
+
+  static getWeaponTier(weaponType) {
+    const tiers = {
+      'sniper': 1,
+      'shotgunPro': 1,
+      'rifle': 2,
+      'shotgun': 2,
+      'pistol': 3,
+      'fists': 4,
+    };
+    return tiers[weaponType] || 3;
   }
 }

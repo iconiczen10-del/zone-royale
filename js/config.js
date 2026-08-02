@@ -7,11 +7,18 @@ export const CONFIG = {
   TREE_COUNT: 80,
   BUSH_COUNT: 50,
   ZONE_DAMAGE_BASE: 5,
-  TARGET_MODE_PROBABILITY: 0.8,   // 80% chance bot focuses player in "THE Target" mode (20% chance fights other bots)
-  PING_INTERVAL: 10,               // seconds between pings
-  PING_HUNT_DURATION: 5,           // seconds bots chase after a ping
-  PING_FIRST_DELAY: 5,             // seconds before the first ping
-  PING_PULSE_DURATION: 1.5,        // seconds the minimap pulse is visible
+  TARGET_MODE_PROBABILITY: 0.8,
+  PING_INTERVAL: 10,
+  PING_HUNT_DURATION: 5,
+  PING_FIRST_DELAY: 5,
+  PING_PULSE_DURATION: 1.5,
+
+  // ─── DOZX TOWN ───
+  TOWN_SIZE: 900, // Updated from 700 to 900
+  TOWN_LOOT_BOXES: 10,
+  TOWN_POSITION: { x: 2700, y: 2700 },
+  TOWN_BUILDINGS: 15,
+  TOWN_NAME: 'DOZX',
 };
 
 export const ZONE_PHASES = [
